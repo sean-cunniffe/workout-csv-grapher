@@ -1,5 +1,6 @@
 import {Component} from '@angular/core';
 import {Log} from './common/log';
+import {LogFactoryService} from './services/log-factory.service';
 
 @Component({
   selector: 'app-root',
@@ -11,19 +12,24 @@ export class AppComponent {
   logs: Log[] = [];
   logMapByExerciseName: Map<string, Log[]> = new Map<string, Log[]>();
   public graph: any = [];
+  delimiter: any = undefined;
+
+  constructor(private logFactory: LogFactoryService) {
+  }
 
   getFile(event: Event): void {
     const fileList: FileList = (event.target as HTMLInputElement).files;
     const file = fileList.item(0);
     const fileReader = new FileReader();
     fileReader.onload = ev => {
-      const split1 = (fileReader.result as string).replace(new RegExp('"', 'g'), '').split('\n');
-      for (const set of split1) {
-        const setSplit = set.split(';');
-        const log = new Log(new Date(setSplit[0]), setSplit[1], setSplit[2], +setSplit[3], +setSplit[4], setSplit[5]
-          , +setSplit[6], +setSplit[7], +setSplit[8], setSplit[9], +setSplit[10], setSplit[11], setSplit[12]);
-        this.logs.push(log);
-      }
+      const data = (fileReader.result as string).trim();
+      const split1: any[] = data.replace(new RegExp('"', 'g'), '').split('\n');
+      // split the first row (title row) to create object
+      const titles: any[] = split1[0].split(this.delimiter);
+      this.logs = this.logFactory
+        .setTitles(titles)
+        .setDelimiter(this.delimiter)
+        .createLogs(split1);
       this.logs.splice(0, 1);
       this.logs.splice(this.logs.length - 1, 1);
 
