@@ -6,6 +6,19 @@
   "display": "standalone",
   "scope": "./",
   "start_url": "./",
+  "share_target": {
+      "action": "/data",
+      "method": "POST",
+      "enctype": "multipart/form-data",
+      "params": {
+        "files": [
+          {
+            "name": "records",
+            "accept": [".csv"]
+          }
+        ]
+      }
+    },
   "icons": [
     {
       "src": "assets/icons/icon-72x72.png",
