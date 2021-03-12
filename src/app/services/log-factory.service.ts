@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {Log} from '../common/log';
-import {Interface} from 'readline';
 
 @Injectable({
   providedIn: 'root'
