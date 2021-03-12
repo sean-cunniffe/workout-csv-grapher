@@ -7,14 +7,17 @@
   "scope": "./",
   "start_url": "./",
   "share_target": {
-      "action": "/data",
+      "action": "/cgi-bin/workout-csv-grapher",
       "method": "POST",
       "enctype": "multipart/form-data",
       "params": {
+        "title": "name",
+        "text": "description",
+        "url": "link",
         "files": [
           {
             "name": "records",
-            "accept": [".csv"]
+            "accept": ["text/csv", ".csv"]
           }
         ]
       }
