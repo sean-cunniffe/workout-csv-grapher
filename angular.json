@@ -22,7 +22,8 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              "src/custom-worker.js"
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",

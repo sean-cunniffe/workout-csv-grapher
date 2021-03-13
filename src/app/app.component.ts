@@ -26,7 +26,9 @@ export class AppComponent implements OnInit {
     } else if (navigator.platform.includes('Mac')) {
       this.delimiter = ',';
     }
-    console.log(this.route.snapshot);
+    navigator.serviceWorker.addEventListener('message', event => {
+      console.log(event);
+    });
   }
 
   getFile(event: Event): void {
