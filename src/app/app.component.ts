@@ -3,6 +3,7 @@ import {Log} from './common/log';
 import {LogFactoryService} from './services/log-factory.service';
 import {ActivatedRoute} from '@angular/router';
 
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -16,12 +17,6 @@ export class AppComponent implements OnInit {
   delimiter: any = undefined;
   navigator: any = navigator.platform;
 
-  @HostListener('fetch', ['$event'])
-  dataFetch(event: Event): void {
-    console.log(event);
-    this.getFile(event);
-  }
-
   constructor(private logFactory: LogFactoryService, private route: ActivatedRoute) {
   }
 
@@ -31,6 +26,7 @@ export class AppComponent implements OnInit {
     } else if (navigator.platform.includes('Mac')) {
       this.delimiter = ',';
     }
+    console.log(this.route.snapshot);
   }
 
   getFile(event: Event): void {
