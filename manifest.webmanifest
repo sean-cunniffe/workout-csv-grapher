@@ -8,12 +8,8 @@
   "start_url": "./",
   "share_target": {
       "action": "/workout-csv-grapher",
-      "method": "POST",
-      "enctype": "multipart/form-data",
+      "method": "GET",
       "params": {
-        "title": "name",
-        "text": "description",
-        "url": "link",
         "files": [
           {
             "name": "records",
