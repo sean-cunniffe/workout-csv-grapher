@@ -23,7 +23,7 @@ const routes: Routes = [
     BrowserModule,
     PlotlyModule,
     NgbModule,
-    ServiceWorkerModule.register('custom-worker.js', {enabled: environment.production}),
+    ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
     RouterModule.forRoot(routes)
   ],
   providers: [],

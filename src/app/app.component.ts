@@ -15,7 +15,6 @@ export class AppComponent implements OnInit {
   logMapByExerciseName: Map<string, Log[]> = new Map<string, Log[]>();
   public graph: any = [];
   delimiter: any = undefined;
-  navigator: any = navigator.platform;
 
   constructor(private logFactory: LogFactoryService, private route: ActivatedRoute) {
   }
@@ -27,6 +26,18 @@ export class AppComponent implements OnInit {
       this.delimiter = ',';
     }
     navigator.serviceWorker.addEventListener('message', event => {
+      console.log(event);
+    });
+    navigator.serviceWorker.addEventListener('fetch', event => {
+      console.log('fetch event');
+      console.log(event);
+    });
+    navigator.serviceWorker.addEventListener('sync', event => {
+      console.log('sync event');
+      console.log(event);
+    });
+    navigator.serviceWorker.addEventListener('push', event => {
+      console.log('push event');
       console.log(event);
     });
   }
