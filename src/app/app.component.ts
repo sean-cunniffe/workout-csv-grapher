@@ -1,7 +1,8 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {Log} from './common/log';
 import {LogFactoryService} from './services/log-factory.service';
-import {ActivatedRoute} from '@angular/router';
+import {NavigationEnd, Router} from '@angular/router';
+import {filter} from 'rxjs/operators';
 
 
 @Component({
@@ -16,7 +17,7 @@ export class AppComponent implements OnInit {
   public graph: any = [];
   delimiter: any = undefined;
 
-  constructor(private logFactory: LogFactoryService, private route: ActivatedRoute) {
+  constructor(private logFactory: LogFactoryService, private route: Router) {
   }
 
   ngOnInit(): void {
@@ -24,27 +25,41 @@ export class AppComponent implements OnInit {
       this.delimiter = ';';
     } else if (navigator.platform.includes('Mac')) {
       this.delimiter = ',';
+    } else {
+      this.delimiter = ';';
     }
-    navigator.serviceWorker.addEventListener('message', event => {
-      console.log(event);
+    // @ts-ignore
+    this.route.events.subscribe(event => {
+      if (!(event instanceof NavigationEnd) || event.url.length <= 1) {
+        return;
+      }
+      const data = event.url.substring(1).slice(0, -1);
+      const csvFile = this.dataURLtoFile(data, 'data');
+      this.getData(csvFile);
     });
-    navigator.serviceWorker.addEventListener('fetch', event => {
-      console.log('fetch event');
-      console.log(event);
-    });
-    navigator.serviceWorker.addEventListener('sync', event => {
-      console.log('sync event');
-      console.log(event);
-    });
-    navigator.serviceWorker.addEventListener('push', event => {
-      console.log('push event');
-      console.log(event);
-    });
+  }
+
+  dataURLtoFile(dataurl: string, filename): File {
+
+    const arr = dataurl.split(',');
+    const mime = 'csv';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new File([u8arr], filename, {type: mime});
   }
 
   getFile(event: Event): void {
     const fileList: FileList = (event.target as HTMLInputElement).files;
-    const file = fileList.item(0);
+    this.getData(fileList.item(0));
+  }
+
+  getData(file: File): void {
     const fileReader = new FileReader();
     fileReader.onload = ev => {
       const data = (fileReader.result as string).trim();

@@ -7,7 +7,7 @@
   "scope": "./",
   "start_url": "./",
   "share_target": {
-      "action": "/workout-csv-grapher",
+      "action": "/",
       "method": "POST",
       "enctype": "multipart/form-data",
       "params": {

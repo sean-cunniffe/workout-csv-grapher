@@ -12,7 +12,7 @@ import {RouterModule, Routes} from '@angular/router';
 PlotlyModule.plotlyjs = PlotlyJS;
 
 const routes: Routes = [
-  {path: '**', component: AppComponent}
+  {path: ':data', component: AppComponent}
 ];
 
 @NgModule({
@@ -23,7 +23,7 @@ const routes: Routes = [
     BrowserModule,
     PlotlyModule,
     NgbModule,
-    ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production}),
+    ServiceWorkerModule.register('custom-worker.js', {enabled: environment.production}),
     RouterModule.forRoot(routes)
   ],
   providers: [],
