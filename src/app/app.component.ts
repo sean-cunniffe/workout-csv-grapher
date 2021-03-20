@@ -1,8 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {Log} from './common/log';
 import {LogFactoryService} from './services/log-factory.service';
-import {NavigationEnd, Router} from '@angular/router';
-import {filter} from 'rxjs/operators';
 
 
 @Component({
@@ -16,8 +14,10 @@ export class AppComponent implements OnInit {
   logMapByExerciseName: Map<string, Log[]> = new Map<string, Log[]>();
   public graph: any = [];
   delimiter: any = undefined;
+  file: File = undefined;
 
-  constructor(private logFactory: LogFactoryService, private route: Router) {
+  constructor(private logFactory: LogFactoryService, private cdr: ChangeDetectorRef) {
+
   }
 
   ngOnInit(): void {
@@ -28,30 +28,16 @@ export class AppComponent implements OnInit {
     } else {
       this.delimiter = ';';
     }
-    // @ts-ignore
-    this.route.events.subscribe(event => {
-      if (!(event instanceof NavigationEnd) || event.url.length <= 1) {
-        return;
+    navigator.serviceWorker.onmessage = (event) => {
+      this.file = event.data.file;
+      if (this.file) {
+        this.getData(this.file);
       }
-      const data = event.url.substring(1).slice(0, -1);
-      const csvFile = this.dataURLtoFile(data, 'data');
-      this.getData(csvFile);
+      this.cdr.detectChanges();
+    };
+    navigator.serviceWorker.controller.postMessage({
+      type: 'READY FOR FILE',
     });
-  }
-
-  dataURLtoFile(dataurl: string, filename): File {
-
-    const arr = dataurl.split(',');
-    const mime = 'csv';
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-
-    return new File([u8arr], filename, {type: mime});
   }
 
   getFile(event: Event): void {
@@ -60,6 +46,7 @@ export class AppComponent implements OnInit {
   }
 
   getData(file: File): void {
+    console.log('Loading data from file...');
     const fileReader = new FileReader();
     fileReader.onload = ev => {
       const data = (fileReader.result as string).trim();
@@ -89,6 +76,7 @@ export class AppComponent implements OnInit {
       }));
       // sort exercises by most logs taken
       this.graph.sort((b, a) => a.data[0].x.length > b.data[0].x.length ? 1 : (b.data[0].x.length > a.data[0].x.length) ? -1 : 0);
+      console.log('...finished loading');
     };
     fileReader.readAsText(file);
   }

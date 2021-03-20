@@ -1,14 +1,10 @@
 <div class="w-100">
   <div class="d-flex flex-column pt-3">
-    <div class="d-flex flex-row ml-auto mr-auto" *ngIf="delimiter === undefined" [hidden]="delimiter">
-      <p class="mt-auto mb-auto">Which device was your data file created?</p>
-      <button class="btn btn-secondary m-2" (click)="graph=[]; delimiter = ';'" >Android</button>
-      <button class="btn btn-secondary m-2" (click)="graph=[]; delimiter = ','" >IPhone</button>
-    </div>
-    <p class="m-auto pt-2 pb-2 font-weight-bold" [hidden]="!delimiter" [textContent]="delimiter === ';' ? 'Android Selected' : 'IPhone Selected'"></p>
     <label class="btn btn-primary ml-auto mr-auto w-75 text-center"> Choose File and Generate graphs
-      <input type="file" accept=".csv" (change)="graph=[]; getFile($event.files.items(0))" [hidden]="true" [disabled]="delimiter === undefined">
-
+      <input type="file" accept=".csv" (change)="graph=[]; getFile($event)" [hidden]="true" [disabled]="delimiter === undefined">
+    </label>
+    <label class="btn btn-primary ml-auto mr-auto w-75 text-center"
+           (click)="graph=[]; getData(file)"> Generate graphs
     </label>
     <p class="m-auto p-2" [style.color]="'red'" [hidden]="!delimiter">Double click a lines legend to isolate it</p>
   </div>

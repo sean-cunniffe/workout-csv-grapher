@@ -12,7 +12,7 @@ import {RouterModule, Routes} from '@angular/router';
 PlotlyModule.plotlyjs = PlotlyJS;
 
 const routes: Routes = [
-  {path: ':data', component: AppComponent}
+  {path: '', component: AppComponent}
 ];
 
 @NgModule({
