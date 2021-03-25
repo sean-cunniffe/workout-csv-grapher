@@ -11,6 +11,7 @@ export class LogFactoryService {
 
   delimiter = '';
 
+  // indexes of column in csv
   titles = {
     date: -1,
     distance: -1,
@@ -24,7 +25,9 @@ export class LogFactoryService {
     workoutNotes: -1
   };
 
-
+  /**
+   * sets the indexes of the columns in the CSV in case it changes
+   */
   setTitles(titles: string[]): LogFactoryService {
     for (let index = 0; index < titles.length; index++) {
       switch (titles[index]) {

@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {Log} from './common/log';
 import {LogFactoryService} from './services/log-factory.service';
+import {GraphFactoryService} from './services/graph-factory.service';
 
 
 @Component({
@@ -11,13 +12,12 @@ import {LogFactoryService} from './services/log-factory.service';
 export class AppComponent implements OnInit {
   title = 'workout-csv-grapher';
   logs: Log[] = [];
-  logMapByExerciseName: Map<string, Log[]> = new Map<string, Log[]>();
   public graph: any = [];
   delimiter: any = undefined;
   file: File = undefined;
   searchTerm = '';
 
-  constructor(private logFactory: LogFactoryService, public cdr: ChangeDetectorRef) {
+  constructor(private logFactory: LogFactoryService, public cdr: ChangeDetectorRef, private graphFactoryService: GraphFactoryService) {
 
   }
 
@@ -143,21 +143,17 @@ export class AppComponent implements OnInit {
       });
       yValues.push(tempYValue);
     });
-    tempGraph.push({
-      data: [{x: xValues, y: yValues, type: 'scatter', marker: {color: 'blue'}, name: 'Top Set (KG)'}],
-      layout: {width: window.innerWidth, title: exerciseName, legend: {orientation: 'h'}},
-      sets: mappingByDate,
-      hidden: false
-    });
+    tempGraph.push(this.graphFactoryService.createGraph(xValues, yValues, exerciseName, mappingByDate));
     return tempGraph;
   }
 
+  /**
+   * hides plots that don't have searchTerm
+   */
   searchTitle(): void {
     for (const exercise of this.graph) {
       const title: string = exercise.layout.title.text;
-      console.log(title);
       exercise.hidden = !title.includes(this.searchTerm);
-      console.log(exercise.hidden);
     }
   }
 }
