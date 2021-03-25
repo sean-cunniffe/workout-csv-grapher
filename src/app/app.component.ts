@@ -15,8 +15,9 @@ export class AppComponent implements OnInit {
   public graph: any = [];
   delimiter: any = undefined;
   file: File = undefined;
+  searchTerm = '';
 
-  constructor(private logFactory: LogFactoryService, private cdr: ChangeDetectorRef) {
+  constructor(private logFactory: LogFactoryService, public cdr: ChangeDetectorRef) {
 
   }
 
@@ -42,7 +43,8 @@ export class AppComponent implements OnInit {
 
   getFile(event: Event): void {
     const fileList: FileList = (event.target as HTMLInputElement).files;
-    this.getData(fileList.item(0));
+    this.file = fileList.item(0);
+    this.getData(this.file);
   }
 
   getData(file: File): void {
@@ -144,9 +146,19 @@ export class AppComponent implements OnInit {
     tempGraph.push({
       data: [{x: xValues, y: yValues, type: 'scatter', marker: {color: 'blue'}, name: 'Top Set (KG)'}],
       layout: {width: window.innerWidth, title: exerciseName, legend: {orientation: 'h'}},
-      sets: mappingByDate
+      sets: mappingByDate,
+      hidden: false
     });
     return tempGraph;
+  }
+
+  searchTitle(): void {
+    for (const exercise of this.graph) {
+      const title: string = exercise.layout.title.text;
+      console.log(title);
+      exercise.hidden = !title.includes(this.searchTerm);
+      console.log(exercise.hidden);
+    }
   }
 }
 

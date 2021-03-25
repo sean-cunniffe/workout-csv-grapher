@@ -1,9 +1,9 @@
 let file = undefined;
 
-self.addEventListener('install', event => event.waitUntil(self.skipWaiting()));
-
-self.addEventListener('activate', event => event.waitUntil(self.clients.claim()));
-
+/**
+ * Checks for a post request (file being sent from share API)
+ * saves the file
+ */
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (event.request.method === 'POST') {
@@ -15,6 +15,10 @@ self.addEventListener('fetch', (event) => {
   }
 });
 
+/**
+ * receives message from app that its ready to receive file
+ * send file to app
+ */
 self.addEventListener('message', (event) =>{
   self.clients.matchAll({
     includeUncontrolled: true,
@@ -27,33 +31,5 @@ self.addEventListener('message', (event) =>{
   });
 })
 
-// self.addEventListener('fetch', (event) => {
-//   const url = new URL(event.request.url);
-//   if (event.request.method === 'POST') {
-//     event.respondWith( (async () =>{
-//       const formData = await event.request.formData();
-//       const file = formData.get('records');
-//       getVersionPort.postMessage({file: file})
-//       return Response.redirect(url, 303);
-//     })());
-//   }
-// });
-
-// self.addEventListener('fetch', (event) => {
-//   const url = new URL(event.request.url);
-//   if (event.request.method === 'POST') {
-//     event.respondWith( (async () =>{
-//       const formData = await event.request.formData();
-//       const file = formData.get('records');
-//       const toBase64 = file => new Promise((resolve, reject) => {
-//         const reader = new FileReader();
-//         reader.readAsDataURL(file);
-//         reader.onload = () => resolve(reader.result);
-//       });
-//       const urlNew = url+ await toBase64(file);
-//       return Response.redirect(urlNew, 303);
-//     })());
-//   }
-// });
-// importScripts('./ngsw-worker.js');
+importScripts('./ngsw-worker.js');
 
