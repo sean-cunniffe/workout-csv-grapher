@@ -66,8 +66,13 @@ export class AppComponent implements OnInit {
       // put both mass moved and top set into one graph
       sets.forEach(((value, key) => {
         const tempExercise = [];
-        const volumeExercise = this.getByExerciseByVolumePerDay(key, value);
-        const topSetExercise = this.getByExerciseByTopSetPerDay(key, value);
+        const mappingByDate: Map<number, Log[]> = new Map<number, Log[]>();
+        // map by date
+        value.forEach(
+          (set) => mappingByDate.has(+set.date) ? mappingByDate.get(+set.date).push(set) : mappingByDate.set(+set.date, [set])
+        );
+        const volumeExercise = this.getByExerciseByVolumePerDay(key, mappingByDate);
+        const topSetExercise = this.getByExerciseByTopSetPerDay(key, mappingByDate);
         volumeExercise.forEach((value1, index, array) => {
           const tempArr = [];
           tempArr.push(value1.data[0]);
@@ -102,39 +107,25 @@ export class AppComponent implements OnInit {
    * @param sets All sets of the same exercise with different dates
    * @private
    */
-  private getByExerciseByVolumePerDay(exerciseName: string, sets: Log[]): any[] {
+  private getByExerciseByVolumePerDay(exerciseName: string, sets: Map<number, Log[]>): any[] {
     const tempGraph: any[] = [];
-    const mappingByDate: Map<number, Log[]> = new Map<number, Log[]>();
-    // map by date
-    sets.forEach(
-      (set, key) => mappingByDate.has(+set.date) ? mappingByDate.get(+set.date).push(set) : mappingByDate.set(+set.date, [set])
-    );
     // add all values together from each date
     const yValues: number[] = [];
     const xValues: Date[] = [];
-    mappingByDate.forEach((logs, key) => {
+    sets.forEach((logs, key) => {
       xValues.push(new Date(key));
       yValues.push(logs.reduce((previousValue, currentValue) => previousValue + (currentValue.reps * currentValue.weight), 0));
     });
-    tempGraph.push({
-      data: [{x: xValues, y: yValues, type: 'scatter', marker: {color: 'red'}, name: 'Total Mass Moved (KG)'}],
-      layout: {width: window.innerWidth, title: exerciseName, legend: {orientation: 'h', font: {size: 18}}},
-      sets: mappingByDate
-    });
+    tempGraph.push(this.graphFactoryService.createGraph(xValues, yValues, exerciseName, sets, 'red'));
     return tempGraph;
   }
 
-  private getByExerciseByTopSetPerDay(exerciseName: string, sets: Log[]): any[] {
+  private getByExerciseByTopSetPerDay(exerciseName: string, sets: Map<number, Log[]>): any[] {
     const tempGraph: any[] = [];
-    const mappingByDate: Map<number, Log[]> = new Map<number, Log[]>();
-    // map by date
-    sets.forEach(
-      (set, key) => mappingByDate.has(+set.date) ? mappingByDate.get(+set.date).push(set) : mappingByDate.set(+set.date, [set])
-    );
     // add all values together from each date
     const yValues: number[] = [];
     const xValues: Date[] = [];
-    mappingByDate.forEach((logs, key) => {
+    sets.forEach((logs, key) => {
       let tempYValue = 0;
       xValues.push(new Date(key));
       logs.forEach(value => {
@@ -143,7 +134,7 @@ export class AppComponent implements OnInit {
       });
       yValues.push(tempYValue);
     });
-    tempGraph.push(this.graphFactoryService.createGraph(xValues, yValues, exerciseName, mappingByDate));
+    tempGraph.push(this.graphFactoryService.createGraph(xValues, yValues, exerciseName, sets, 'blue'));
     return tempGraph;
   }
 
