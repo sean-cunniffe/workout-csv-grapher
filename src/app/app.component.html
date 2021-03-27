@@ -12,7 +12,7 @@
            (input)="searchTerm = $event.target.value;searchTitle()">
   </div>
   <ng-container *ngFor="let plot of graph">
-    <div class="w-100 d-flex flex-row" *ngIf="!plot.hidden">
+    <div class="w-100 d-flex flex-column" *ngIf="!plot.hidden">
       <plotly-plot class="mw-100 mt-2 mb-2" [data]="plot.data"
                    [layout]="plot.layout"></plotly-plot>
     </div>

@@ -41,12 +41,18 @@ export class AppComponent implements OnInit {
     });
   }
 
+  /**
+   * get file from page
+   */
   getFile(event: Event): void {
     const fileList: FileList = (event.target as HTMLInputElement).files;
     this.file = fileList.item(0);
     this.getData(this.file);
   }
 
+  /**
+   * get data from file
+   */
   getData(file: File): void {
     console.log('Loading data from file...');
     const fileReader = new FileReader();
@@ -65,19 +71,19 @@ export class AppComponent implements OnInit {
       const sets: Map<string, Log[]> = this.splitIntoExerciseNames(this.logs);
       // put both mass moved and top set into one graph
       sets.forEach(((value, key) => {
-        const tempExercise = [];
         const mappingByDate: Map<number, Log[]> = new Map<number, Log[]>();
         // map by date
         value.forEach(
           (set) => mappingByDate.has(+set.date) ? mappingByDate.get(+set.date).push(set) : mappingByDate.set(+set.date, [set])
         );
-        const volumeExercise = this.getByExerciseByVolumePerDay(key, mappingByDate);
-        const topSetExercise = this.getByExerciseByTopSetPerDay(key, mappingByDate);
+        const volumeExercise = this.graphFactoryService.createTotalVolumeGraph(key, mappingByDate);
+        const topSetExercise = this.graphFactoryService.createTopSetVolumeGraph(key, mappingByDate);
+        const topWeightExercise = this.graphFactoryService.createMostWeightUsedGraph(key, mappingByDate);
         volumeExercise.forEach((value1, index, array) => {
           const tempArr = [];
           tempArr.push(value1.data[0]);
           tempArr.push(topSetExercise[index].data[0]);
-          tempExercise.push();
+          tempArr.push(topWeightExercise[index].data[0]);
           this.graph.push({data: tempArr, layout: value1.layout});
         });
       }));
@@ -88,6 +94,10 @@ export class AppComponent implements OnInit {
     fileReader.readAsText(file);
   }
 
+
+  /**
+   * Map exercise by exercise name
+   */
   splitIntoExerciseNames(logs: Log[]): Map<string, Log[]> {
     const sets: Map<string, Log[]> = new Map<string, Log[]>();
     for (const log of logs) {
@@ -102,49 +112,12 @@ export class AppComponent implements OnInit {
   }
 
   /**
-   *
-   * @param exerciseName
-   * @param sets All sets of the same exercise with different dates
-   * @private
-   */
-  private getByExerciseByVolumePerDay(exerciseName: string, sets: Map<number, Log[]>): any[] {
-    const tempGraph: any[] = [];
-    // add all values together from each date
-    const yValues: number[] = [];
-    const xValues: Date[] = [];
-    sets.forEach((logs, key) => {
-      xValues.push(new Date(key));
-      yValues.push(logs.reduce((previousValue, currentValue) => previousValue + (currentValue.reps * currentValue.weight), 0));
-    });
-    tempGraph.push(this.graphFactoryService.createGraph(xValues, yValues, exerciseName, sets, 'red'));
-    return tempGraph;
-  }
-
-  private getByExerciseByTopSetPerDay(exerciseName: string, sets: Map<number, Log[]>): any[] {
-    const tempGraph: any[] = [];
-    // add all values together from each date
-    const yValues: number[] = [];
-    const xValues: Date[] = [];
-    sets.forEach((logs, key) => {
-      let tempYValue = 0;
-      xValues.push(new Date(key));
-      logs.forEach(value => {
-        const massMoved = value.weight * value.reps;
-        tempYValue = massMoved > tempYValue ? massMoved : tempYValue;
-      });
-      yValues.push(tempYValue);
-    });
-    tempGraph.push(this.graphFactoryService.createGraph(xValues, yValues, exerciseName, sets, 'blue'));
-    return tempGraph;
-  }
-
-  /**
    * hides plots that don't have searchTerm
    */
   searchTitle(): void {
     for (const exercise of this.graph) {
       const title: string = exercise.layout.title.text;
-      exercise.hidden = !title.includes(this.searchTerm);
+      exercise.hidden = !title.toLowerCase().includes(this.searchTerm.toLowerCase());
     }
   }
 }
